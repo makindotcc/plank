@@ -840,7 +840,7 @@ namespace Plank
 				cr.restore ();
 			
 			// draw indicators
-			if (draw_value.show_indicator && item.Indicator != IndicatorState.NONE)
+			if (draw_value.show_indicator)
 				draw_indicator_state (cr, draw_value.hover_region, item.Indicator, item.State);
 		}
 		
@@ -880,7 +880,7 @@ namespace Plank
 			var surface = new Surface.with_surface (width, height, model);
 			
 			var icon_size = int.min (width, height);
-			var urgent_color = get_styled_color ();
+			var urgent_color = (theme.IndicatorStyle == IndicatorStyleType.LEGACY ? get_styled_color () : theme.IndicatorColor);
 			urgent_color.add_hue (theme.UrgentHueShift);
 			
 			// draw item's count
@@ -935,22 +935,24 @@ namespace Plank
 		
 		void draw_indicator_state (Cairo.Context cr, Gdk.Rectangle item_rect, IndicatorState indicator_state, ItemState item_state)
 		{
-			if (indicator_state == IndicatorState.NONE)
+			if (indicator_state == IndicatorState.NONE || theme.IndicatorSize <= 0)
 				return;
 			
 			unowned PositionManager position_manager = controller.position_manager;
+			unowned Surface indicator_surface;
 			var index = indicator_state - 1;
 			
-			if (indicator_buffer[index] == null) {
-				indicator_buffer[index] = theme.create_indicator_for_state (indicator_state, ItemState.NORMAL,
-					position_manager.IconSize, position_manager.Position, item_buffer);
+			if ((item_state & ItemState.URGENT) == 0) {
+				if (indicator_buffer[index] == null)
+					indicator_buffer[index] = theme.create_indicator_for_state (indicator_state, ItemState.NORMAL,
+						position_manager.IconSize, position_manager.Position, item_buffer);
+				indicator_surface = indicator_buffer[index];
+			} else {
+				if (urgent_indicator_buffer[index] == null)
+					urgent_indicator_buffer[index] = theme.create_indicator_for_state (indicator_state, ItemState.URGENT,
+						position_manager.IconSize, position_manager.Position, item_buffer);
+				indicator_surface = urgent_indicator_buffer[index];
 			}
-			if (urgent_indicator_buffer[index] == null) {
-				urgent_indicator_buffer[index] = theme.create_indicator_for_state (indicator_state, ItemState.URGENT,
-					position_manager.IconSize, position_manager.Position, item_buffer);
-			}
-			
-			unowned Surface indicator_surface = ((item_state & ItemState.URGENT) != 0 ? urgent_indicator_buffer[index] : indicator_buffer[index]);
 			
 			var x = 0.0, y = 0.0;
 			switch (position_manager.Position) {
