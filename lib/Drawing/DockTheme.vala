@@ -97,6 +97,9 @@ namespace Plank
 		[Description(nick = "badge-color", blurb = "The color (RGBA) of the badge displaying urgent count")]
 		public Color BadgeColor { get; set; }
 
+		[Description(nick = "active-glow-disable", blurb = "Disable drawing active window glow indicator")]
+		public bool ActiveGlowDisable { get; set; }
+
 		public DockTheme (string name)
 		{
 			base.with_name (name);
@@ -133,6 +136,7 @@ namespace Plank
 			ItemMoveTime = 450;
 			CascadeHide = true;
 			BadgeColor = { 0.0, 0.0, 0.0, 0.0 };
+			ActiveGlowDisable = false;
 		}
 		
 		/**

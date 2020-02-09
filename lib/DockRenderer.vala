@@ -804,12 +804,14 @@ namespace Plank
 			}
 			
 			// draw active glow
-			var active_time = int64.max (0LL, frame_time - item.LastActive);
-			var opacity = double.min (1, active_time / (double) (theme.ActiveTime * 1000));
-			if ((item.State & ItemState.ACTIVE) == 0)
-				opacity = 1 - opacity;
-			if (opacity > 0) {
-				theme.draw_active_glow (item_buffer, background_rect, draw_value.background_region, item.AverageIconColor, opacity, position);
+			if (!theme.ActiveGlowDisable) {
+                var active_time = int64.max (0LL, frame_time - item.LastActive);
+                var opacity = double.min (1, active_time / (double) (theme.ActiveTime * 1000));
+                if ((item.State & ItemState.ACTIVE) == 0)
+                    opacity = 1 - opacity;
+                if (opacity > 0) {
+                    theme.draw_active_glow (item_buffer, background_rect, draw_value.background_region, item.AverageIconColor, opacity, position);
+                }
 			}
 			
 			// draw the icon
